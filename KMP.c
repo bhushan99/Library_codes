@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void find_ff(char *t,int m,int a[])
+void find_ff(string t,int m,int a[])
 {
   int i,j;
   a[0]=0;j=0;
@@ -12,16 +12,37 @@ void find_ff(char *t,int m,int a[])
   }
 }
 
-void kmp(int m,int n,char *t,char *s,int *a)
+void kmp(int m,int n,string t,string s,int *a)
 {
   int q=0,i;
   for(i=0;i<n;)
   {
-    if(s[i]==t[q]) {q+=1;i++;}
+    if(s[i]==t[q]) {q++;i++;}
     else if(q) {q=a[q-1];}
     else i++;
     if(q==m) {printf("%d\t",i-m);q=a[q-1];}
   }
+}
+
+int strStr(const char* s, const char* t) {
+    int n=strlen(s),m=strlen(t);
+    if(!n || !m) return 0;
+    int f[m];
+    f[0]=0;
+    int i,match=0;
+    for(i=1;i<m;) {
+        if(t[i]==t[match]) {match++;f[i]=match;i++;}
+        else if(match) match=f[match-1];
+        else {f[i]=0;i++;}
+    }
+    match=0;i=0;
+    for(;i<n;) {
+        if(s[i]==t[match]) {i++;match++;}
+        else if(match) match=f[match-1];
+        else i++;
+        if(match==m) return i-m; // to get all occurances, {ans.pb(i-m);match=f[match-1];}
+    }
+    return -1;
 }
 
 int main()

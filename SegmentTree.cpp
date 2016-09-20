@@ -22,11 +22,91 @@ typedef long long ll;
 #define imin numeric_limits<int>::min()
 #define lmax numeric_limits<ll>::max()
 #define lmin numeric_limits<ll>::min()
-#define dmax numeric_limits<double>::max()
-#define dmin numeric_limits<double>::min()
-#define fmax numeric_limits<float>::max()
-#define fmin numeric_limits<float>::min()
-#define sqr(x) (x)*(x)
+#define debug(var) cerr<<#var<<" = "<<(var)<<endl;
+#define debugarr(var,n) cerr<<#var<<" = { ";rep(i,n) cerr<<var[i]<<" ";cerr<<"}"<<endl; 
+#define debugmat(var,m,n) cerr<<#var<<" = \n";rep(i,m) {rep(j,n) cerr<<var[i][j]<<" ";cerr<<endl;}
+
+ll a[100005];
+ll sg[270000];
+
+inline void readint(int &x) {
+    register int c = getchar_unlocked();
+    x = 0;
+    int neg = 0;
+    for(; ((c<48 || c>57) && c != '-'); c = getchar_unlocked());
+    if(c=='-') {
+        neg = 1;
+        c = getchar_unlocked();
+    }
+    for(; c>47 && c<58 ; c = getchar_unlocked()) {
+        x = (x<<1) + (x<<3) + c - 48;
+    }
+    if(neg)
+        x = -x;
+}
+
+void build(int index,int start,int end) {
+	if(start==end) sg[index]=a[start];
+	else {
+		int mid=(start+end)/2;
+		build(2*index,start,mid);
+		build(2*index+1,mid+1,end);
+		sg[index]=sg[2*index]+sg[2*index+1];
+	}
+}
+
+void update(int index,int start,int end,int q1,int q2) {
+	if(start==end) {sg[index]=sqrt(sg[index]);return;}
+	if(start==q1 && end==q2) {
+ 		if(sg[index]>end-start+1) {
+			int mid=(start+end)/2;
+			update(2*index,start,mid,start,mid);
+			update(2*index+1,mid+1,end,mid+1,end);
+			sg[index]=sg[2*index]+sg[2*index+1];
+		}
+	} else {
+		if(sg[index]>end-start+1) {
+			int mid=(start+end)/2;
+			if(q1>mid) update(2*index+1,mid+1,end,q1,q2);
+			else if (q2<mid+1) update(2*index,start,mid,q1,q2);
+			else {
+				update(2*index,start,mid,q1,mid);
+				update(2*index+1,mid+1,end,mid+1,q2);
+			}
+			sg[index]=sg[2*index]+sg[2*index+1];
+		}
+	}
+}
+
+ll query(int index,int start,int end,int q1,int q2) {
+	if(start==end) {return sg[index];}
+	if(start==q1 && end==q2) {
+ 		return sg[index];
+	} else {
+		int mid=(start+end)/2;
+		if(q1>mid) return query(2*index+1,mid+1,end,q1,q2);
+		else if (q2<mid+1) return query(2*index,start,mid,q1,q2);
+		else return query(2*index,start,mid,q1,mid)+query(2*index+1,mid+1,end,mid+1,q2);
+	}
+}
+
+int main() {
+	int n;cin>>n;int ct=1;
+	while(!feof(stdin)) {
+		cout<<"Case #"<<ct<<":\n";ct++;
+		rep(i,n) cin>>a[i];
+		build(1,0,n-1);
+		int q;readint(q);
+		while(q--) {
+			int x,y,z;readint(x);readint(y);readint(z);
+			if(!x) update(1,0,n-1,y-1,z-1);
+			else cout<<query(1,0,n-1,y-1,z-1)<<endl;
+		}
+		cout<<endl;
+		cin>>n;
+	}
+	return 0;
+}
 
 struct SegmentTreeNode {
 	int start, end;
