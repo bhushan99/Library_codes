@@ -27,6 +27,8 @@ typedef long long ll;
 #define fmax numeric_limits<float>::max()
 #define fmin numeric_limits<float>::min()
 #define sqr(x) (x)*(x)
+#define MOD2 1073676287
+
 set<int> hs[600001];
 int main() {
 	int n,m;cin>>n>>m;
